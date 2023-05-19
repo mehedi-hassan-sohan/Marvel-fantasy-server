@@ -44,7 +44,7 @@ async function run() {
       res.send(result)
     })  
 
-    app.post('/addToys', async (req, res) => {
+     app.post('/addToys', async (req, res) => {
       const newToys = req.body;
       console.log(newToys);
       const result = await ToysCollection.insertOne(newToys);
