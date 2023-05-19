@@ -12,7 +12,7 @@ require('dotenv').config()
 // mongodb 
 
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.6ypoazf.mongodb.net/?retryWrites=true&w=majority`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -29,22 +29,34 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();  
 
-    const categoryCollections = client.db("ToysCategory").collection("Toys")
-    const ToysCollection = client.db("ToysCategory").collection("ToysCollection")
-    
+    const categoryCollections = client.db("categoryCollections").collection("Toys")
+    const ToysCollection = client.db("ToysCollection").collection("allToys")
+     
+
+    app.get('/addToys', async (req, res) => {
+      const cursor = ToysCollection.find();
+      const result = await cursor.toArray();
+      res.send(result);
+  })
     app.get('/categories', async(req,res)=>{
       const cursor = categoryCollections.find();
       const result  = await cursor.toArray()
       res.send(result)
     })  
 
-    app.post('/toys', async (req, res) => {
+    app.post('/addToys', async (req, res) => {
       const newToys = req.body;
       console.log(newToys);
       const result = await ToysCollection.insertOne(newToys);
       res.send(result);
   })
-
+ 
+  app.get("/addToys/:id", async (req, res) => {
+    const id = req.params.id;
+    const query = { _id: new ObjectId(id) };
+    const result = await ToysCollection.findOne(query);
+    res.send(result);
+  });
   
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
